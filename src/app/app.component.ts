@@ -5,6 +5,7 @@ import { map, repeat, takeWhile } from 'rxjs/operators';
 import { Question } from './models/queation.model';
 import { DataService } from './services/data.service';
 import * as QAcations from './store/actions/question.actions';
+import { getCurrentQuestion } from './store/question.selectors';
 
 @Component({
   selector: 'app-root',
@@ -28,44 +29,25 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(QAcations.getAll());
-    this.dataService.fetchQuestions().subscribe((question: Question) => {
-      this.questions.push(question);
-      this.questionN = question;
+    this.store.select(getCurrentQuestion).subscribe((questions: Question[]) => {
+      this.questions = questions;
+      console.log(this.questions);
       setInterval(() => { this.nextQuestion() }, this.timeIntervalSeconds * 1000);
     });
   }
 
 
   nextQuestion() {
-    //fetching Questions to get next one if correct answer or time is up or wrong 3 strike.
-    this.dataService.fetchQuestions().subscribe((question: Question) => {
-      if (this.questions.length === 10) {
-        console.log(this.questions);
-        return;
-      } else {
-        this.numberOfAttempts = 3;
-        if (!this.questionExists(question)) {
-          this.questions.push(question);
-          this.questionN = question;
-        } else {
-          this.nextQuestion();
-        }
-      }
-    });
-  }
-
-
-  questionExists(question) {
-    return this.questions.some(function (el) {
-      return el.question === question;
-    });
+    this.store.dispatch(QAcations.next());
   }
 
   isCorrectAns(ans) {
     if (ans === this.questionN.correct_answer) {
+      this.store.dispatch(QAcations.correct());
       alert("Grate!!!");
       this.nextQuestion();
     } else {
+      this.store.dispatch(QAcations.wrong());
       this.numberOfAttempts = this.numberOfAttempts - 1;
       alert("Wrong Answer,Please try again")
       if (this.numberOfAttempts === 0) {

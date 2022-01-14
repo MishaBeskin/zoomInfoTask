@@ -36,3 +36,10 @@ i,span{
 i{
   font-size: 1.5rem;
 }
+
+::ng-deep .p-carousel .p-carousel-content .p-carousel-prev{
+  display: none;
+}
+::ng-deep .p-carousel .p-carousel-content .p-carousel-next{
+  display: none;
+}

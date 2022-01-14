@@ -5,5 +5,5 @@ import { QuestionState } from "./reducers/question.reducers";
 const getFeatureState = createFeatureSelector<QuestionState>('questions');
 export const getCurrentQuestion = createSelector(
   getFeatureState,
-  (state) =>
+  (state: QuestionState) => state.question
 );

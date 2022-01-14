@@ -32,9 +32,6 @@ export class DataService {
         environment.questionsUrl
       ).pipe(
         map(resQuestionData => {
-
-
-
           const { correct_answer, incorrect_answers, question } = resQuestionData['results'][0]
           const result: Question = {
             incorrect_answers: this.getIncorrectAnswer(incorrect_answers),
@@ -42,10 +39,6 @@ export class DataService {
             correct_answer: atob(correct_answer)
           };
           return result;
-        }),
-        tap(question => {
-          this._question.next(question);
-          console.log(question);
         })
       );
   }
