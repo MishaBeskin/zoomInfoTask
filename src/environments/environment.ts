@@ -3,8 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  questionsUrl: "https://opentdb.com/api.php?amount=1&encode=base64&type=multiple"
 };
+
 
 /*
  * For easier debugging in development mode, you can import the following file
