@@ -4,6 +4,7 @@ import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Question } from '../models/queation.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,26 +26,22 @@ export class DataService {
   constructor(private http: HttpClient) { }
 
   //getting the next question.
-  fetchQuestions() {
+  fetchQuestions(): Observable<Question> {
     return this.http
       .get<any[]>(
         environment.questionsUrl
       ).pipe(
         map(resQuestionData => {
 
-          const question = {};
-          const questionEncode = resQuestionData['results'][0]
-          let value;
-          for (let key in questionEncode) {
-            if (key === "incorrect_answers") {
-              value = this.getIncorrectAnswer(questionEncode[key]);
-            } else {
-              value = atob(questionEncode[key]);
-            }
-            question[key] = value
-            // Use `key` and `value`
-          }
-          return question;
+
+
+          const { correct_answer, incorrect_answers, question } = resQuestionData['results'][0]
+          const result: Question = {
+            incorrect_answers: this.getIncorrectAnswer(incorrect_answers),
+            question: atob(question),
+            correct_answer: atob(correct_answer)
+          };
+          return result;
         }),
         tap(question => {
           this._question.next(question);

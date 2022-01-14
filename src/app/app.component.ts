@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { interval, Subject, Subscription } from 'rxjs';
 import { map, repeat, takeWhile } from 'rxjs/operators';
 import { Question } from './models/queation.model';
 import { DataService } from './services/data.service';
+import * as QAcations from './store/actions/question.actions';
 
 @Component({
   selector: 'app-root',
@@ -12,12 +14,9 @@ import { DataService } from './services/data.service';
 export class AppComponent implements OnInit {
   title = 'zoomInfoTask';
   questionN: Question = {
-    "category": "",
     "correct_answer": "",
-    "difficulty": "easy",
     "incorrect_answers": [],
-    "question": "",
-    "type": "multiple"
+    "question": ""
   };
   private questionSub: Subscription;
   timeIntervalSeconds = 20;
@@ -25,9 +24,10 @@ export class AppComponent implements OnInit {
   questions: Question[] = [];
   numberOfAttempts = 3;
   //when component is constructed trying to get data if is there something
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService, private store: Store) { }
 
   ngOnInit() {
+    this.store.dispatch(QAcations.getAll());
     this.dataService.fetchQuestions().subscribe((question: Question) => {
       this.questions.push(question);
       this.questionN = question;

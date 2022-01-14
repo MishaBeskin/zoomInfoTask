@@ -1,34 +1,45 @@
 
-import { Question } from 'src/app/models/queation.model';
-import { QuestionActionTypes, All } from '../actions/question.actions';
-
-export interface State {
-  // is a user authenticated?
-  isAuthenticated: boolean;
-  // if authenticated, there should be a user object
-  question: Question | null;
-  // error message
-  errorMessage: string | null;
+import { Question } from '../../../app/models/queation.model';
+import { createReducer, on } from '@ngrx/store'
+import * as QAcations from '../actions/question.actions';
+export interface QuestionState {
+  question: Question[],
+  triesLeft: number,
+  currentIndex: number
 }
 
-export const initialState: State = {
+export const initialState: QuestionState = {
   question: null,
-  errorMessage: null
+  triesLeft: 3,
+  currentIndex: -1
 };
 
-export function reducer(state = initialState, action: All): State {
-  switch (action.type) {
-    case QuestionActionTypes.GET_QUESTION: {
+export const questionReducer = createReducer<QuestionState>(
+  initialState,
+  on(QAcations.retrievedAll,
+    (state, action) => {
+
       return {
         ...state,
-        question: {
-        },
-        errorMessage: null
-      };
+        question: action.questions,
+        triesLeft: 3,
+        currentIndex: 0
+      }
     }
-
-    default: {
-      return state;
-    }
-  }
-}
+  ),
+  on(QAcations.next,
+    (state) => {
+      return {
+        ...state,
+        triesLeft: 3,
+        currentIndex: state.currentIndex + 1
+      }
+    }),
+  on(QAcations.wrong,
+    (state) => {
+      return {
+        ...state,
+        triesLeft: state.triesLeft - 1
+      }
+    })
+)

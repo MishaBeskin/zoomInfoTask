@@ -1,34 +1,45 @@
-import { map } from 'rxjs/internal/operators';
 import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Router } from '@angular/router';
-import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Observable } from 'rxjs';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/catch';
-import { tap } from 'rxjs/operators';
-
-import { QuestionActionTypes, GetQuestion } from '../actions/question.actions';
+import { forkJoin, Observable, Subject } from 'rxjs';
+import { concatMap, mergeMap } from 'rxjs/operators';
+import { Question } from 'src/app/models/queation.model';
 import { DataService } from 'src/app/services/data.service';
+import * as QAcations from '../actions/question.actions';
 
 
 @Injectable()
-export class AuthEffects {
+export class QuestionEffects {
 
   constructor(
-    private actions: Actions,
+    private actions$: Actions,
     private qustServ: DataService,
-    private router: Router,
   ) { }
 
-  @Effect({ dispatch: false })
-  GetQuestion: Observable<any> = this.actions
-    .ofType(QuestionActionTypes.GET_QUESTION)
-    .map((action: GetQuestion) => action)
-    .switchMap(payload => {
-      return this.qustServ.fetchQuestions();
-    });
+  getAll$ = createEffect(() => this.actions$.pipe(
+    ofType(QAcations.getAll),
+    mergeMap(action => {
+      const obsList: Observable<any>[] = this.requestsArray();
+
+      const sub: Subject<Action> = new Subject<Action>();
+      forkJoin(obsList).subscribe((arr: Question[]) => {
+        sub.next(QAcations.retrievedAll({ questions: arr }));
+        sub.complete();
+      });
+      return sub;
+    })
+
+  ))
+
+  requestsArray(): Observable<Question>[] {
+    const qArray = [];
+    for (let i = 0; i < 10; i++) {
+      qArray.push(this.qustServ.fetchQuestions());
+
+    }
+    return qArray;
+  }
+
 
 }
+
