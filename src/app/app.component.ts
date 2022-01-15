@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { interval, Subject, Subscription } from 'rxjs';
+import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { map, repeat, takeWhile } from 'rxjs/operators';
 import { Question } from './models/queation.model';
 import { DataService } from './services/data.service';
@@ -20,13 +20,15 @@ export class AppComponent implements OnInit {
     "incorrect_answers": [],
     "question": ""
   };
+
+  countDown$: Observable<number>;
   private questionSub: Subscription;
   private questionWrongSub: Subscription;
   timeIntervalSeconds = 20;
   private leftSeconds = 20;
   questions: Question[] = [];
   numberOfAttempts = 3;
-
+  interval;
   constructor(private store: Store) { }
 
   //on init I fetching the questions using action and effects
@@ -35,12 +37,17 @@ export class AppComponent implements OnInit {
     this.store.select(getQuestions).subscribe((questions: Question[]) => {
       this.questions = questions;
       if (questions) {
+        //Question timer
+        this.countDown$ = interval(1000).pipe(
+          map(value => this.leftSeconds - value),
+          takeWhile(x => x >= 1),
+        );
         this.questionN = questions[0];
       }
       console.log(this.questions);
     });
     //setting interval for 20 sec to get next question
-    setInterval(() => { this.nextQuestion() }, this.timeIntervalSeconds * 1000);
+    this.interval = setInterval(() => { this.nextQuestion() }, this.timeIntervalSeconds * 1000);
   }
 
 
@@ -52,9 +59,15 @@ export class AppComponent implements OnInit {
     this.questionSub = this.store.select(getCurrentIndex).subscribe((index: number) => {
       //if we get index = 9 it means we have finished all 10 questions
       if (index > 9) {
+        clearInterval(this.interval);
         return
       }
       //updating actual question
+      //Question timer
+      this.countDown$ = interval(1000).pipe(
+        map(value => this.leftSeconds - value),
+        takeWhile(x => x >= 1),
+      );
       this.questionN = this.questions[index];
       console.log(this.questionN);
     });
@@ -81,12 +94,5 @@ export class AppComponent implements OnInit {
 
     }
   }
-
-  //timer used for the clock
-  countDown$ = interval(1000).pipe(
-    map(value => this.leftSeconds - value),
-    takeWhile(x => x >= 1),
-    repeat()
-  );
 
 }

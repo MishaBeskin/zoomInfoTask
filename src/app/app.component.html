@@ -1,16 +1,16 @@
 
 <div class="main-container">
-<p-carousel [value]="questions" [numVisible]="1" [numScroll]="1" [circular]="false" [autoplayInterval]="21500">
+<p-carousel [value]="questions" [numVisible]="1" [numScroll]="1" [circular]="false" >
 <ng-template let-question pTemplate="item">
   <div class="container">
-    <div class="p-mb-1"><i class="pi pi-question-circle"></i> {{question.question}}</div> <div>Time: <i class="pi pi-clock"></i> <span> {{ countDown$ | async }}  Seconds</span></div>
+    <div class="p-mb-1"><i class="pi pi-question-circle"></i> {{questionN.question}}</div> <div>Time: <i class="pi pi-clock"></i> <span> {{ countDown$ | async }}  Seconds</span></div>
   </div>
   <div class="container-inner">
-    <div *ngFor="let ans of question.incorrect_answers">
+    <div *ngFor="let ans of questionN.incorrect_answers">
       <button (click)="isCorrectAns(ans)" class="p-button-outlined" pButton type="button" label="{{ans}}" ></button>
     </div>
     <div>
-      <button (click)="isCorrectAns(question.correct_answer)" class="p-button-outlined" pButton type="button" label="{{question.correct_answer}}" ></button>
+      <button (click)="isCorrectAns(questionN.correct_answer)" class="p-button-outlined" pButton type="button" label="{{questionN.correct_answer}}" ></button>
     </div>
   </div>
 </ng-template>
