@@ -1,6 +1,6 @@
 
 <div class="main-container">
-<p-carousel [value]="questions" [numVisible]="1" [numScroll]="1" [circular]="false" >
+<p-carousel [value]="questions" [numVisible]="1" [numScroll]="1" [circular]="false" [autoplayInterval]="21500">
 <ng-template let-question pTemplate="item">
   <div class="container">
     <div class="p-mb-1"><i class="pi pi-question-circle"></i> {{question.question}}</div> <div>Time: <i class="pi pi-clock"></i> <span> {{ countDown$ | async }}  Seconds</span></div>

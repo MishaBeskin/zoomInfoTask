@@ -2,6 +2,8 @@
 import { Question } from '../../../app/models/queation.model';
 import { createReducer, on } from '@ngrx/store'
 import * as QAcations from '../actions/question.actions';
+
+//creating initial state  for the Questions
 export interface QuestionState {
   question: Question[],
   triesLeft: number,
@@ -14,6 +16,7 @@ export const initialState: QuestionState = {
   currentIndex: -1
 };
 
+//reducers that actually needed to preform to update the sate
 export const questionReducer = createReducer<QuestionState>(
   initialState,
   on(QAcations.retrievedAll,

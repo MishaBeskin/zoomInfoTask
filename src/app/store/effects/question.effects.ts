@@ -16,6 +16,7 @@ export class QuestionEffects {
     private qustServ: DataService,
   ) { }
 
+  //in this effect I used mergeMap and ForkJoin to get all 10 Questions.
   getAll$ = createEffect(() => this.actions$.pipe(
     ofType(QAcations.getAll),
     mergeMap(action => {
